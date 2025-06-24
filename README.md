@@ -4,30 +4,30 @@ ju test
 
 - Get Books
 
-GET 127.0.0.1:8081/books
+    GET 127.0.0.1:8081/books
 
 - Get Book By Id
 
-GET 127.0.0.1:8081/book?id=3
+    GET 127.0.0.1:8081/book?id=3
 
 - Add Book
 
-POST 127.0.0.1:8081/book
+    POST 127.0.0.1:8081/book
 
-Json 
+    Json 
 
-{
+    {
     "name": "NewBookFromRequest",
     "author": "NewAuthor"
 }
 
 - Update Book by ID
 
-PUT 127.0.0.1:8081/book
+    PUT 127.0.0.1:8081/book
 
-Json
+    Json
 
-{
+    {
     "id": 2,
     "name": "UpdateookFromRequest",
     "author": "UpdateAuthor"
