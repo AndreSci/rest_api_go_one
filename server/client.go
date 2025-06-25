@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/AndreSci/rest_api_go_one/pkg"
 )
 
 type Client struct {
@@ -40,13 +42,11 @@ func (c Client) GetBooks() ([]byte, error) {
 	if timeForUpdate < timeSpendAfter {
 		fmt.Println("Try to update books")
 		// TODO SQL REQUEST HERE
-		books = []Book{
-			{1, "Book1", "Author1"},
-			{2, "Book2", "Author2"},
-			{3, "Book3", "Author3"},
-			{4, "Book4", "Author4"},
-		}
+		err := selectBooksPostgres()
 
+		if err != nil {
+			return nil, err
+		}
 		timeUpdate = time.Now()
 	}
 
@@ -69,11 +69,11 @@ func (c Client) GetBookById(id int) ([]byte, error) {
 	if timeForUpdate < timeSpendAfter {
 		fmt.Println("Try to update books")
 		// TODO SQL REQUEST HERE
-		books = []Book{
-			{1, "Book1", "Author1"},
-			{2, "Book2", "Author2"},
-			{3, "Book3", "Author3"},
-			{4, "Book4", "Author4"},
+		//books = genBooks()
+		err := selectBooksPostgres()
+
+		if err != nil {
+			return nil, err
 		}
 
 		timeUpdate = time.Now()
@@ -89,17 +89,21 @@ func (c Client) GetBookById(id int) ([]byte, error) {
 
 func (c Client) AddBook(newBook *NewBook) error {
 
-	// TODO SQL REQUEST
-	lastId := books[len(books)-1].Id
+	tx, err := pkg.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
 
-	neme := newBook.Name
-	author := newBook.Author
+	_, err = tx.Exec("insert into books (name, author) values ($1, $2);", newBook.Name, newBook.Author)
 
-	newBookReb := Book{lastId + 1, neme, author}
+	if err != nil {
+		return err
+	}
+	fmt.Println("Success add book")
+	timeUpdate = time.Now().Add(-100 * time.Second)
 
-	books = append(books, newBookReb)
-
-	return nil
+	return tx.Commit()
 }
 
 func (c Client) UpdateBook(updateBook *Book) error {
@@ -110,6 +114,31 @@ func (c Client) UpdateBook(updateBook *Book) error {
 		return err
 	}
 	books[index] = *updateBook
+
+	return nil
+}
+
+// Жестко но что поделать :)
+func selectBooksPostgres() error {
+
+	rows, err := pkg.DB.Query("select * from books;")
+	if err != nil {
+		return err
+	}
+
+	booksNew := make([]Book, 0)
+
+	for rows.Next() {
+		b := Book{}
+		err := rows.Scan(&b.Id, &b.Name, &b.Author)
+		if err != nil {
+			return err
+		}
+
+		booksNew = append(booksNew, b)
+	}
+
+	books = booksNew
 
 	return nil
 }
