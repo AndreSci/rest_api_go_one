@@ -32,3 +32,6 @@ ju test
     "name": "UpdateookFromRequest",
     "author": "UpdateAuthor"
 }
+
+- Delete Book by ID
+    DELETE 127.0.0.1:8081/book?id=3
