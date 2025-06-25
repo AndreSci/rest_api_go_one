@@ -30,7 +30,7 @@ func main() {
 	defer pkg.DB.Close()
 
 	if err = pkg.DB.Ping(); err != nil {
-		log.Fatal("БД недоступна:", err)
+		log.Fatal("No connection to the DataBase:", err)
 	}
 
 	// CREATE HANDLES FUNC

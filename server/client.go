@@ -106,6 +106,25 @@ func (c Client) AddBook(newBook *NewBook) error {
 	return tx.Commit()
 }
 
+func (c Client) DeleteBook(id int) error {
+	tx, err := pkg.DB.Begin()
+
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec("delete from books where id = $1;", id)
+
+	if err != nil {
+		return err
+	}
+	fmt.Println("Success delete book")
+	timeUpdate = time.Now().Add(-100 * time.Second)
+
+	return tx.Commit()
+}
+
 func (c Client) UpdateBook(updateBook *Book) error {
 
 	_, index, err := SearchBookByID(updateBook.Id)

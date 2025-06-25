@@ -145,7 +145,7 @@ func handlerBookDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	byteBook, err := client.GetBookById(id)
+	err = client.DeleteBook(id)
 
 	if err != nil {
 		fmt.Println(err)
@@ -153,5 +153,5 @@ func handlerBookDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(byteBook)
+	w.Write([]byte("Success delete book"))
 }
