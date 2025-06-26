@@ -11,7 +11,6 @@ type ResultTest struct {
 	test1 string
 	test2 string
 	test3 string
-	test4 string
 }
 
 func RunTests() {
@@ -22,7 +21,7 @@ func RunTests() {
 
 func runAll() ResultTest {
 
-	result := ResultTest{"none", "none", "none", "none"}
+	result := ResultTest{"none", "none", "none"}
 
 	client, err := server.NewClient(time.Second * 10)
 	if err != nil {

@@ -38,6 +38,7 @@ func main() {
 	http.HandleFunc("/books", server.LoggerMiddleware(server.HandlerBooksGet))
 	http.HandleFunc("/book", server.LoggerMiddleware(server.HandleBook))
 
+	// AUTO-TEST
 	go unittest_test.RunTests()
 
 	if err := http.ListenAndServe(":8081", nil); err != nil {
