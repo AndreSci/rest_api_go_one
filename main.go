@@ -12,6 +12,7 @@ import (
 
 	"github.com/AndreSci/rest_api_go_one/pkg"
 	"github.com/AndreSci/rest_api_go_one/server"
+	unittest_test "github.com/AndreSci/rest_api_go_one/unit-tests"
 
 	_ "github.com/lib/pq" // Имптор для сторонних эффектов
 )
@@ -36,6 +37,8 @@ func main() {
 	// CREATE HANDLES FUNC
 	http.HandleFunc("/books", server.LoggerMiddleware(server.HandlerBooksGet))
 	http.HandleFunc("/book", server.LoggerMiddleware(server.HandleBook))
+
+	go unittest_test.RunTests()
 
 	if err := http.ListenAndServe(":8081", nil); err != nil {
 		log.Fatal(err)

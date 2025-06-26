@@ -161,3 +161,27 @@ func selectBooksPostgres() error {
 
 	return nil
 }
+
+func (c Client) DeleteAll() error {
+	tx, err := pkg.DB.Begin()
+
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec("DROP TABLE IF EXISTS books;")
+
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec("CREATE TABLE books (id SERIAL PRIMARY KEY, name VARCHAR(255), author VARCHAR(255));")
+
+	if err != nil {
+		return err
+	}
+	fmt.Println("Success DROP TABLE books")
+	timeUpdate = time.Now().Add(-100 * time.Second)
+
+	return tx.Commit()
+}
