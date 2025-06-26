@@ -26,14 +26,14 @@ func runAll() ResultTest {
 
 	client, err := server.NewClient(time.Second * 10)
 	if err != nil {
-		result.test1 = fmt.Sprintf("Error creat client: %d", err)
+		result.test1 = fmt.Sprintf("Error creat client: %v", err)
 		return result
 	}
 	result.test1 = "Done"
 
 	errDelAll := client.DeleteAll()
 	if errDelAll != nil {
-		result.test2 = fmt.Sprintf("Error Delete All books: %d", errDelAll)
+		result.test2 = fmt.Sprintf("Error Delete All books: %v", errDelAll)
 		return result
 	}
 	result.test2 = "Done"
@@ -45,7 +45,7 @@ func runAll() ResultTest {
 
 		errAddBook := client.AddBook(&book)
 		if errAddBook != nil {
-			result.test3 = fmt.Sprintf("Error Add books (index: %s): %s", i, errAddBook)
+			result.test3 = fmt.Sprintf("Error Add books (index: %d): %v", i, errAddBook)
 			return result
 		}
 	}
