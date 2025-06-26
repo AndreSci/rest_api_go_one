@@ -37,5 +37,9 @@ ju test
     DELETE 127.0.0.1:8081/book?id=3
 
 
-Friendly remind 
+Friendly remind -------------
+// go get -u github.com/lib/pq
+// требуется для установки драйвера коннекта к БД postgres
+// _ "github.com/lib/pq" // Имптор для сторонних эффектов
+
 docker-compose up -d
