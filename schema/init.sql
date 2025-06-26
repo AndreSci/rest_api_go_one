@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS books;
+
+CREATE TABLE books (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    author VARCHAR(255)
+);

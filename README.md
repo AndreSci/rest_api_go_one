@@ -35,3 +35,7 @@ ju test
 
 - Delete Book by ID
     DELETE 127.0.0.1:8081/book?id=3
+
+
+Friendly remind 
+docker-compose up -d
