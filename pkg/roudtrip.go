@@ -1,4 +1,4 @@
-package server
+package pkg
 
 import (
 	"fmt"
@@ -9,14 +9,14 @@ import (
 )
 
 // Базовый Middleware для логгирования запросов
-type loggingRoundTripper struct {
-	logger io.Writer
-	next   http.RoundTripper
+type LoggingRoundTripper struct {
+	Logger io.Writer
+	Next   http.RoundTripper
 }
 
-func (l loggingRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
-	fmt.Fprintf(l.logger, "[%s] %s %sn", time.Now().Format(time.ANSIC), r.Method, r.URL)
-	return l.next.RoundTrip(r)
+func (l LoggingRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
+	fmt.Fprintf(l.Logger, "[%s] %s %sn", time.Now().Format(time.ANSIC), r.Method, r.URL)
+	return l.Next.RoundTrip(r)
 }
 
 // Middleware ЛОГИРОВАНИЯ ДАННЫХ В ЗАПРОСЕ

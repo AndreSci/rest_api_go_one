@@ -1,4 +1,4 @@
-package server
+package service
 
 import (
 	"encoding/json"
@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/AndreSci/rest_api_go_one/internal/cache"
+	"github.com/AndreSci/rest_api_go_one/internal/models"
 	"github.com/AndreSci/rest_api_go_one/pkg"
 )
 
@@ -19,13 +21,12 @@ func NewClient(timeout time.Duration) (*Client, error) {
 	if timeout == 0 {
 		return nil, errors.New("timeout can't be zero")
 	}
-
 	return &Client{
 		client: &http.Client{
 			Timeout: timeout,
-			Transport: &loggingRoundTripper{
-				logger: os.Stdout,
-				next:   http.DefaultTransport,
+			Transport: &pkg.LoggingRoundTripper{
+				Logger: os.Stdout,
+				Next:   http.DefaultTransport,
 			},
 		},
 	}, nil
@@ -33,13 +34,13 @@ func NewClient(timeout time.Duration) (*Client, error) {
 
 func (c Client) GetBooks() ([]byte, error) {
 
-	mu.Lock()
-	defer mu.Unlock()
+	cache.Mu.Lock()
+	defer cache.Mu.Unlock()
 
 	currentTime := time.Now()
-	timeSpendAfter := int(currentTime.Sub(timeUpdate).Seconds())
+	timeSpendAfter := int(currentTime.Sub(cache.TimeUpdate).Seconds())
 
-	if timeForUpdate < timeSpendAfter {
+	if cache.TimeForUpdate < timeSpendAfter {
 		fmt.Println("Try to update books")
 		// TODO SQL REQUEST HERE
 		err := selectBooksPostgres()
@@ -47,26 +48,26 @@ func (c Client) GetBooks() ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		timeUpdate = time.Now()
+		cache.TimeUpdate = time.Now()
 	}
 
-	fmt.Println(books)
+	fmt.Println(cache.Books)
 
-	if len(books) < 1 {
+	if len(cache.Books) < 1 {
 		return nil, errors.New("something went wrong: no data or connection to the database")
 	}
 
-	return json.Marshal(books)
+	return json.Marshal(cache.Books)
 }
 
 func (c Client) GetBookById(id int) ([]byte, error) {
-	mu.Lock()
-	defer mu.Unlock()
+	cache.Mu.Lock()
+	defer cache.Mu.Unlock()
 
 	currentTime := time.Now()
-	timeSpendAfter := int(currentTime.Sub(timeUpdate).Seconds())
+	timeSpendAfter := int(currentTime.Sub(cache.TimeUpdate).Seconds())
 
-	if timeForUpdate < timeSpendAfter {
+	if cache.TimeForUpdate < timeSpendAfter {
 		fmt.Println("Try to update books")
 		// TODO SQL REQUEST HERE
 		//books = genBooks()
@@ -76,10 +77,10 @@ func (c Client) GetBookById(id int) ([]byte, error) {
 			return nil, err
 		}
 
-		timeUpdate = time.Now()
+		cache.TimeUpdate = time.Now()
 	}
 
-	book, _, err := SearchBookByID(id)
+	book, _, err := cache.SearchBookByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -87,9 +88,9 @@ func (c Client) GetBookById(id int) ([]byte, error) {
 	return json.Marshal(book)
 }
 
-func (c Client) AddBook(newBook *NewBook) error {
+func (c Client) AddBook(newBook *models.NewBook) error {
 
-	tx, err := pkg.DB.Begin()
+	tx, err := models.DB.Begin()
 	if err != nil {
 		return err
 	}
@@ -101,13 +102,13 @@ func (c Client) AddBook(newBook *NewBook) error {
 		return err
 	}
 	fmt.Println("Success add book")
-	timeUpdate = time.Now().Add(-100 * time.Second)
+	cache.TimeUpdate = time.Now().Add(-100 * time.Second)
 
 	return tx.Commit()
 }
 
 func (c Client) DeleteBook(id int) error {
-	tx, err := pkg.DB.Begin()
+	tx, err := models.DB.Begin()
 
 	if err != nil {
 		return err
@@ -120,19 +121,19 @@ func (c Client) DeleteBook(id int) error {
 		return err
 	}
 	fmt.Println("Success delete book")
-	timeUpdate = time.Now().Add(-100 * time.Second)
+	cache.TimeUpdate = time.Now().Add(-100 * time.Second)
 
 	return tx.Commit()
 }
 
-func (c Client) UpdateBook(updateBook *Book) error {
+func (c Client) UpdateBook(updateBook *models.Book) error {
 
-	_, index, err := SearchBookByID(updateBook.Id)
+	_, index, err := cache.SearchBookByID(updateBook.Id)
 
 	if err != nil {
 		return err
 	}
-	books[index] = *updateBook
+	cache.Books[index] = *updateBook
 
 	return nil
 }
@@ -140,15 +141,15 @@ func (c Client) UpdateBook(updateBook *Book) error {
 // Жестко но что поделать :)
 func selectBooksPostgres() error {
 
-	rows, err := pkg.DB.Query("select * from books;")
+	rows, err := models.DB.Query("select * from books;")
 	if err != nil {
 		return err
 	}
 
-	booksNew := make([]Book, 0)
+	booksNew := make([]models.Book, 0)
 
 	for rows.Next() {
-		b := Book{}
+		b := models.Book{}
 		err := rows.Scan(&b.Id, &b.Name, &b.Author)
 		if err != nil {
 			return err
@@ -157,13 +158,13 @@ func selectBooksPostgres() error {
 		booksNew = append(booksNew, b)
 	}
 
-	books = booksNew
+	cache.Books = booksNew
 
 	return nil
 }
 
 func (c Client) DeleteAll() error {
-	tx, err := pkg.DB.Begin()
+	tx, err := models.DB.Begin()
 
 	if err != nil {
 		return err
@@ -181,7 +182,7 @@ func (c Client) DeleteAll() error {
 		return err
 	}
 	fmt.Println("Success DROP TABLE books")
-	timeUpdate = time.Now().Add(-100 * time.Second)
+	cache.TimeUpdate = time.Now().Add(-100 * time.Second)
 
 	return tx.Commit()
 }

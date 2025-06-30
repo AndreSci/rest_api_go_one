@@ -1,4 +1,4 @@
-package server
+package service
 
 import (
 	"encoding/json"
@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/AndreSci/rest_api_go_one/internal/models"
 )
 
 func HandlerBooksGet(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +88,7 @@ func handlerBookByIdUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var book Book
+	var book models.Book
 	err = json.NewDecoder(r.Body).Decode(&book)
 	if err != nil {
 		fmt.Printf("Error read Body: %d\n", err)
@@ -113,7 +115,7 @@ func handlerBookAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var book NewBook
+	var book models.NewBook
 	err = json.NewDecoder(r.Body).Decode(&book)
 	if err != nil {
 		fmt.Printf("Error read Body: %d\n", err)

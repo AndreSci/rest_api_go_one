@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/AndreSci/rest_api_go_one/server"
+	"github.com/AndreSci/rest_api_go_one/internal/models"
+	"github.com/AndreSci/rest_api_go_one/internal/service"
 )
 
 type ResultTest struct {
@@ -23,7 +24,7 @@ func runAll() ResultTest {
 
 	result := ResultTest{"none", "none", "none"}
 
-	client, err := server.NewClient(time.Second * 10)
+	client, err := service.NewClient(time.Second * 10)
 	if err != nil {
 		result.test1 = fmt.Sprintf("Error creat client: %v", err)
 		return result
@@ -40,7 +41,7 @@ func runAll() ResultTest {
 	for i := 0; i < 10; i++ {
 		name := fmt.Sprintf("book_%d", i+1)
 		author := "test_author"
-		book := server.NewBook{Name: name, Author: author}
+		book := models.NewBook{Name: name, Author: author}
 
 		errAddBook := client.AddBook(&book)
 		if errAddBook != nil {

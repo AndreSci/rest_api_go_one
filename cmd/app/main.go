@@ -7,19 +7,20 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"log"
+
 	"net/http"
 	"os"
 
 	"github.com/AndreSci/rest_api_go_one/internal/config"
+	"github.com/AndreSci/rest_api_go_one/internal/models"
+	"github.com/AndreSci/rest_api_go_one/internal/service"
 	"github.com/AndreSci/rest_api_go_one/pkg"
-	"github.com/AndreSci/rest_api_go_one/server"
 	unittest_test "github.com/AndreSci/rest_api_go_one/unit-tests"
 	"github.com/joho/godotenv"
 
 	_ "github.com/lib/pq" // Имптор для сторонних эффектов
 
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -29,9 +30,9 @@ const (
 
 // Обьявляет логер Logrus
 func init() {
-	logrus.SetFormatter(&logrus.JSONFormatter{})
-	logrus.SetOutput(os.Stdout)
-	logrus.SetLevel(logrus.InfoLevel)
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.InfoLevel)
 }
 
 // @title Books APP
@@ -44,7 +45,7 @@ func init() {
 func main() {
 	_ = godotenv.Load(".env") // загружает переменные из файла .env ДЛЯ WINDOWS
 	//fmt.Println("Hello REST API with Golang")
-	logrus.Info("Hello REST API with Golang")
+	log.Info("Hello REST API with Golang")
 
 	cfg, err := config.New(CONFIG_DIR, CONFIG_FILE)
 
@@ -52,25 +53,31 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Printf("config: %+v\n", cfg)
+	fmt.Printf("config: %+v\n", *cfg)
 
 	// CONNECT TO DB
 	// NEED to import POSTGRES driver
-	connStr := "host=127.0.0.1 port=5432 user=postgres password=goLANGn1nja dbname=postgres sslmode=disable"
+	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		cfg.DB.Host,
+		cfg.DB.Port,
+		cfg.DB.Username,
+		cfg.DB.Password,
+		cfg.DB.Name,
+		cfg.DB.SSLMode)
 
-	pkg.DB, err = sql.Open("postgres", connStr)
+	models.DB, err = sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal("Exception in:", err)
 	}
-	defer pkg.DB.Close()
+	defer models.DB.Close()
 
-	if err = pkg.DB.Ping(); err != nil {
+	if err = models.DB.Ping(); err != nil {
 		log.Fatal("No connection to the DataBase:", err)
 	}
 
 	// CREATE HANDLES FUNC
-	http.HandleFunc("/books", server.LoggerMiddleware(server.HandlerBooksGet))
-	http.HandleFunc("/book", server.LoggerMiddleware(server.HandleBook))
+	http.HandleFunc("/books", pkg.LoggerMiddleware(service.HandlerBooksGet))
+	http.HandleFunc("/book", pkg.LoggerMiddleware(service.HandleBook))
 
 	// AUTO-TEST
 	go unittest_test.RunTests()
