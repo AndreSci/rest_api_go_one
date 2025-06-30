@@ -54,3 +54,9 @@ _ "github.com/lib/pq" // Имптор для сторонних эффектов
 Развернуть базу PostgresSQL в Docker контейнере
 docker-compose up -d
 
+подгрузка .ENV файла
+
+    go get github.com/joho/godotenv
+
+    в main.go добавить _ = godotenv.Load(".env") // загружает переменные из файла .env
+

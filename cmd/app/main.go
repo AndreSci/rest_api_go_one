@@ -10,14 +10,19 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/AndreSci/rest_api_go_one/internal/config"
 	"github.com/AndreSci/rest_api_go_one/pkg"
 	"github.com/AndreSci/rest_api_go_one/server"
 	unittest_test "github.com/AndreSci/rest_api_go_one/unit-tests"
+	"github.com/joho/godotenv"
 
 	_ "github.com/lib/pq" // Имптор для сторонних эффектов
 )
 
-const configPath = "config/main"
+const (
+	CONFIG_DIR  = "configs"
+	CONFIG_FILE = "main"
+)
 
 // @title Books APP
 // @version 1.0
@@ -27,12 +32,21 @@ const configPath = "config/main"
 // @BasePath /
 
 func main() {
+	_ = godotenv.Load(".env") // загружает переменные из файла .env ДЛЯ WINDOWS
 	fmt.Println("Hello REST API with Golang")
 
-	var err error
+	cfg, err := config.New(CONFIG_DIR, CONFIG_FILE)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("config: %+v\n", cfg)
+
 	// CONNECT TO DB
 	// NEED to import POSTGRES driver
 	connStr := "host=127.0.0.1 port=5432 user=postgres password=goLANGn1nja dbname=postgres sslmode=disable"
+
 	pkg.DB, err = sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal("Exception in:", err)
@@ -50,7 +64,7 @@ func main() {
 	// AUTO-TEST
 	go unittest_test.RunTests()
 
-	if err := http.ListenAndServe(":8081", nil); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.Server.Port), nil); err != nil {
 		log.Fatal(err)
 	}
 }

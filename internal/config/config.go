@@ -35,7 +35,7 @@ func New(folder, filename string) (*Config, error) {
 		return nil, err
 	}
 
-	if err := envconfig.Process("db", &cfg.DB); err != nil {
+	if err := envconfig.Process("DB", &cfg.DB); err != nil {
 		return nil, err
 	}
 
