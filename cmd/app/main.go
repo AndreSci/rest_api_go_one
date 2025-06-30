@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/AndreSci/rest_api_go_one/internal/config"
 	"github.com/AndreSci/rest_api_go_one/pkg"
@@ -17,12 +18,21 @@ import (
 	"github.com/joho/godotenv"
 
 	_ "github.com/lib/pq" // Имптор для сторонних эффектов
+
+	"github.com/sirupsen/logrus"
 )
 
 const (
 	CONFIG_DIR  = "configs"
 	CONFIG_FILE = "main"
 )
+
+// Обьявляет логер Logrus
+func init() {
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.SetOutput(os.Stdout)
+	logrus.SetLevel(logrus.InfoLevel)
+}
 
 // @title Books APP
 // @version 1.0
@@ -33,7 +43,8 @@ const (
 
 func main() {
 	_ = godotenv.Load(".env") // загружает переменные из файла .env ДЛЯ WINDOWS
-	fmt.Println("Hello REST API with Golang")
+	//fmt.Println("Hello REST API with Golang")
+	logrus.Info("Hello REST API with Golang")
 
 	cfg, err := config.New(CONFIG_DIR, CONFIG_FILE)
 
