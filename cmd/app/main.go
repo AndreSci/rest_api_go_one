@@ -17,7 +17,14 @@ import (
 	_ "github.com/lib/pq" // Имптор для сторонних эффектов
 )
 
-const configPath = "configs/config"
+const configPath = "config/main"
+
+// @title Books APP
+// @version 1.0
+// @description API Server for Books
+
+// @host 127.0.0.1:8081
+// @BasePath /
 
 func main() {
 	fmt.Println("Hello REST API with Golang")

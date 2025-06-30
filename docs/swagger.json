@@ -1,0 +1,12 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API Server for Books",
+        "title": "Books APP",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "127.0.0.1:8081",
+    "basePath": "/",
+    "paths": {}
+}

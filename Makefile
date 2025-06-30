@@ -1,2 +1,3 @@
 swag: 
-	swag init -g 
+	swag init -g cmd/app/main.go
+	
