@@ -17,6 +17,8 @@ import (
 	_ "github.com/lib/pq" // Имптор для сторонних эффектов
 )
 
+const configPath = "configs/config"
+
 func main() {
 	fmt.Println("Hello REST API with Golang")
 
