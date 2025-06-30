@@ -2,15 +2,24 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/AndreSci/rest_api_go_one/internal/models"
 )
 
+// @Summary Books
+// @Tags books
+// @Description get full list of books
+// @Accept  none
+// @Produce  json
+// @Success 200 {integer} integer 1
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
 func HandlerBooksGet(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodGet {
@@ -20,7 +29,7 @@ func HandlerBooksGet(w http.ResponseWriter, r *http.Request) {
 
 	client, err := NewClient(time.Second * 10)
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		w.Write([]byte(err.Error()))
 		return
 	}
@@ -28,7 +37,7 @@ func HandlerBooksGet(w http.ResponseWriter, r *http.Request) {
 	byteBooks, err := client.GetBooks()
 
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		w.Write([]byte(err.Error()))
 		return
 	}
@@ -52,6 +61,15 @@ func HandleBook(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// @Summary Book
+// @Tags book
+// @Description Get book by ID
+// @Accept  int
+// @Produce  json
+// @Success 200 {integer} integer 1
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
 func handlerBookByIdGet(w http.ResponseWriter, r *http.Request) {
 	client, err := NewClient(time.Second * 10)
 	if err != nil {
@@ -64,7 +82,7 @@ func handlerBookByIdGet(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(idFromCx)
 
 	if err != nil {
-		fmt.Printf("convertion error: Wrong type of ID in Body: %d\n", id)
+		log.Printf("convertion error: Wrong type of ID in Body: %d\n", id)
 		w.Write([]byte("convertion error: Wrong type of ID in Body"))
 		return
 	}
@@ -72,7 +90,7 @@ func handlerBookByIdGet(w http.ResponseWriter, r *http.Request) {
 	byteBook, err := client.GetBookById(id)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		w.Write([]byte(err.Error()))
 		return
 	}
@@ -80,10 +98,19 @@ func handlerBookByIdGet(w http.ResponseWriter, r *http.Request) {
 	w.Write(byteBook)
 }
 
+// @Summary Book
+// @Tags book
+// @Description Update book by ID
+// @Accept  json
+// @Produce  json
+// @Success 200 {integer} integer 1
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
 func handlerBookByIdUpdate(w http.ResponseWriter, r *http.Request) {
 	client, err := NewClient(time.Second * 10)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 		w.Write([]byte(err.Error()))
 		return
 	}
@@ -91,7 +118,7 @@ func handlerBookByIdUpdate(w http.ResponseWriter, r *http.Request) {
 	var book models.Book
 	err = json.NewDecoder(r.Body).Decode(&book)
 	if err != nil {
-		fmt.Printf("Error read Body: %d\n", err)
+		log.Error(err)
 		w.Write([]byte("Error Update book"))
 		return
 	}
@@ -99,7 +126,7 @@ func handlerBookByIdUpdate(w http.ResponseWriter, r *http.Request) {
 	err = client.UpdateBook(&book)
 
 	if err != nil {
-		fmt.Printf("Error with add book: %d\n", err)
+		log.Printf("Error with add book: %d\n", err)
 		w.Write([]byte("Error Update book"))
 		return
 	}
@@ -107,6 +134,15 @@ func handlerBookByIdUpdate(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Success Update book"))
 }
 
+// @Summary Book
+// @Tags book
+// @Description add book
+// @Accept  json
+// @Produce  json
+// @Success 200 {integer} integer 1
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
 func handlerBookAdd(w http.ResponseWriter, r *http.Request) {
 	client, err := NewClient(time.Second * 10)
 	if err != nil {
@@ -118,22 +154,31 @@ func handlerBookAdd(w http.ResponseWriter, r *http.Request) {
 	var book models.NewBook
 	err = json.NewDecoder(r.Body).Decode(&book)
 	if err != nil {
-		fmt.Printf("Error read Body: %d\n", err)
+		log.Printf("Error read Body: %d\n", err)
 	}
 
 	err = client.AddBook(&book)
 
 	if err != nil {
-		fmt.Printf("Error with add book: %d\n", err)
+		log.Printf("Error with add book: %d\n", err)
 	}
 
 	w.Write([]byte("Success add book"))
 }
 
+// @Summary Book
+// @Tags book
+// @Description Delete from Db book by ID
+// @Accept  int
+// @Produce  none
+// @Success 200 {integer} integer 1
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
 func handlerBookDelete(w http.ResponseWriter, r *http.Request) {
 	client, err := NewClient(time.Second * 10)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 		w.Write([]byte(err.Error()))
 		return
 	}
@@ -142,7 +187,7 @@ func handlerBookDelete(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(idFromCx)
 
 	if err != nil {
-		fmt.Printf("convertion error: Wrong type of ID in Body: %d\n", id)
+		log.Printf("convertion error: Wrong type of ID in Body: %d\n", id)
 		w.Write([]byte("convertion error: Wrong type of ID in Body"))
 		return
 	}
@@ -150,7 +195,7 @@ func handlerBookDelete(w http.ResponseWriter, r *http.Request) {
 	err = client.DeleteBook(id)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		w.Write([]byte(err.Error()))
 		return
 	}

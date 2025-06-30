@@ -3,7 +3,6 @@ package service
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -11,6 +10,8 @@ import (
 	"github.com/AndreSci/rest_api_go_one/internal/cache"
 	"github.com/AndreSci/rest_api_go_one/internal/models"
 	"github.com/AndreSci/rest_api_go_one/pkg"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type Client struct {
@@ -41,7 +42,7 @@ func (c Client) GetBooks() ([]byte, error) {
 	timeSpendAfter := int(currentTime.Sub(cache.TimeUpdate).Seconds())
 
 	if cache.TimeForUpdate < timeSpendAfter {
-		fmt.Println("Try to update books")
+		log.Info("Try to update books")
 		// TODO SQL REQUEST HERE
 		err := selectBooksPostgres()
 
@@ -51,7 +52,7 @@ func (c Client) GetBooks() ([]byte, error) {
 		cache.TimeUpdate = time.Now()
 	}
 
-	fmt.Println(cache.Books)
+	log.Info(cache.Books)
 
 	if len(cache.Books) < 1 {
 		return nil, errors.New("something went wrong: no data or connection to the database")
@@ -68,7 +69,7 @@ func (c Client) GetBookById(id int) ([]byte, error) {
 	timeSpendAfter := int(currentTime.Sub(cache.TimeUpdate).Seconds())
 
 	if cache.TimeForUpdate < timeSpendAfter {
-		fmt.Println("Try to update books")
+		log.Info("Try to update books")
 		// TODO SQL REQUEST HERE
 		//books = genBooks()
 		err := selectBooksPostgres()
@@ -101,7 +102,7 @@ func (c Client) AddBook(newBook *models.NewBook) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Success add book")
+	log.Info("Success add book")
 	cache.TimeUpdate = time.Now().Add(-100 * time.Second)
 
 	return tx.Commit()
@@ -120,7 +121,7 @@ func (c Client) DeleteBook(id int) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Success delete book")
+	log.Info("Success delete book")
 	cache.TimeUpdate = time.Now().Add(-100 * time.Second)
 
 	return tx.Commit()
@@ -181,7 +182,7 @@ func (c Client) DeleteAll() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Success DROP TABLE books")
+	log.Info("Success DROP TABLE books")
 	cache.TimeUpdate = time.Now().Add(-100 * time.Second)
 
 	return tx.Commit()
