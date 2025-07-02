@@ -9,12 +9,13 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/AndreSci/rest_api_go_one/internal/models"
+	"github.com/AndreSci/rest_api_go_one/internal/repository"
 )
 
 // @Summary Books
 // @Tags books
 // @Description get full list of books
-// @Accept  none
+// @Accept  nones
 // @Produce  json
 // @Success 200 {integer} integer 1
 // @Failure 400,404 {object} errorResponse
@@ -27,7 +28,7 @@ func HandlerBooksGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client, err := NewClient(time.Second * 10)
+	client, err := repository.NewClient(time.Second * 10)
 	if err != nil {
 		log.Error(err)
 		w.Write([]byte(err.Error()))
@@ -71,7 +72,7 @@ func HandleBook(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 func handlerBookByIdGet(w http.ResponseWriter, r *http.Request) {
-	client, err := NewClient(time.Second * 10)
+	client, err := repository.NewClient(time.Second * 10)
 	if err != nil {
 		log.Fatal(err)
 		w.Write([]byte(err.Error()))
@@ -108,7 +109,7 @@ func handlerBookByIdGet(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 func handlerBookByIdUpdate(w http.ResponseWriter, r *http.Request) {
-	client, err := NewClient(time.Second * 10)
+	client, err := repository.NewClient(time.Second * 10)
 	if err != nil {
 		log.Error(err)
 		w.Write([]byte(err.Error()))
@@ -144,7 +145,7 @@ func handlerBookByIdUpdate(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 func handlerBookAdd(w http.ResponseWriter, r *http.Request) {
-	client, err := NewClient(time.Second * 10)
+	client, err := repository.NewClient(time.Second * 10)
 	if err != nil {
 		log.Fatal(err)
 		w.Write([]byte(err.Error()))
@@ -176,7 +177,7 @@ func handlerBookAdd(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 func handlerBookDelete(w http.ResponseWriter, r *http.Request) {
-	client, err := NewClient(time.Second * 10)
+	client, err := repository.NewClient(time.Second * 10)
 	if err != nil {
 		log.Error(err)
 		w.Write([]byte(err.Error()))

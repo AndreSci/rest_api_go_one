@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/AndreSci/rest_api_go_one/internal/models"
-	"github.com/AndreSci/rest_api_go_one/internal/service"
+	"github.com/AndreSci/rest_api_go_one/internal/repository"
 )
 
 type ResultTest struct {
@@ -24,7 +24,7 @@ func runAll() ResultTest {
 
 	result := ResultTest{"none", "none", "none"}
 
-	client, err := service.NewClient(time.Second * 10)
+	client, err := repository.NewClient(time.Second * 10)
 	if err != nil {
 		result.test1 = fmt.Sprintf("Error creat client: %v", err)
 		return result
